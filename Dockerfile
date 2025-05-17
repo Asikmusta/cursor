@@ -13,9 +13,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy app files
 COPY . /usr/share/nginx/html
 
-# Add a non-root user with a high UID
-RUN addgroup -g 1000650000 myusergroup && \
-    adduser -u 1000650000 -G myusergroup -h /usr/share/nginx/html myuser
+# Add a non-root user with a more standard UID/GID
+RUN addgroup -g 1000 myusergroup && \
+    adduser -u 1000 -G myusergroup -h /usr/share/nginx/html myuser
 
 # Make /tmp/nginx writable by the non-root user
 RUN chown -R myuser:myusergroup /tmp/nginx
