@@ -13,12 +13,12 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy app files
 COPY . /usr/share/nginx/html
 
-# Make /tmp/nginx writable by the non-root user
-RUN chown -R myuser:myusergroup /tmp/nginx
-
 # Add a non-root user with a high UID
 RUN addgroup -g 1000650000 myusergroup && \
     adduser -u 1000650000 -G myusergroup -h /usr/share/nginx/html myuser
+
+# Make /tmp/nginx writable by the non-root user
+RUN chown -R myuser:myusergroup /tmp/nginx
 
 # Change ownership of /usr/share/nginx/html to the new user
 RUN chown -R myuser:myusergroup /usr/share/nginx/html
