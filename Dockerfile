@@ -1,19 +1,19 @@
-# Use lightweight Nginx image
 FROM nginx:alpine
 
-# 1. Cleanup default files (your existing requirement)
+# Remove default content
 RUN rm -rf /usr/share/nginx/html/*
 
-# 2. Permission fixes (new additions)
-RUN mkdir -p /var/cache/nginx/client_temp && \
-    chmod -R 755 /var/cache/nginx && \
-    chown -R nginx:nginx /var/cache/nginx
+# Create alternative temp directories we can write to
+RUN mkdir -p /tmp/nginx/cache && \
+    ln -s /tmp/nginx/cache /var/cache/nginx
 
-# 3. Copy application files
+# Custom nginx config to use writable paths
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy app files
 COPY . /usr/share/nginx/html
 
-# 4. Run as nginx user (UID 101) for security
-USER nginx
+# Run as nginx user (UID 101)
+USER 101
 
-# 5. Expose port
 EXPOSE 80
