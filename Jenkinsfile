@@ -39,12 +39,19 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject('cursor-app') {
-                            // Use the full image stream reference
+                            // First check if the app exists
                             if (!openshift.selector("dc", "cursor-app").exists()) {
-                                openshift.newApp("cursor-app/cursor-app:latest", "--name=cursor-app")
+                                // Create all resources from the image stream
+                                openshift.newApp("cursor-app:latest", "--name=cursor-app")
+                                // Wait for deployment to be ready
+                                openshift.selector("dc", "cursor-app").untilEach(1) {
+                                    dc -> dc.object().status.availableReplicas > 0
+                                }
+                            } else {
+                                // If exists, just trigger a new deployment
+                                def dc = openshift.selector("dc", "cursor-app")
+                                dc.rollout().latest()
                             }
-                            def dc = openshift.selector("dc", "cursor-app")
-                            dc.rollout().latest()
                         }
                     }
                 }
