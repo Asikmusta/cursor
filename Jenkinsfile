@@ -15,11 +15,19 @@ pipeline {
         }
 
         // Stage 2: Build Docker image in OpenShift
-        stage('Build') {
+       stage('Build') {
             steps {
                 script {
                     openshift.withCluster() {
-                        openshift.startBuild("cursor-app", "--from-dir=.")
+                        // Explicitly set namespace for all operations
+                        openshift.withProject('cursor-app') {  
+                            // Verify BuildConfig exists first
+                            if (openshift.selector("bc", "cursor-app").exists()) {
+                                openshift.startBuild("cursor-app", "--from-dir=.")
+                            } else {
+                                error "BuildConfig 'cursor-app' not found in namespace 'cursor-app'"
+                            }
+                        }
                     }
                 }
             }
