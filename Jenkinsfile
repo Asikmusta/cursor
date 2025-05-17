@@ -38,11 +38,14 @@ pipeline {
             steps {
                 script {
                     openshift.withCluster() {
-                        if (!openshift.selector("dc", "cursor-app").exists()) {
-                            openshift.newApp("cursor-app", "--name=cursor-app")
+                        openshift.withProject('cursor-app') {
+                            // Use the full image stream reference
+                            if (!openshift.selector("dc", "cursor-app").exists()) {
+                                openshift.newApp("cursor-app/cursor-app:latest", "--name=cursor-app")
+                            }
+                            def dc = openshift.selector("dc", "cursor-app")
+                            dc.rollout().latest()
                         }
-                        def dc = openshift.selector("dc", "cursor-app")
-                        dc.rollout().latest()
                     }
                 }
             }
