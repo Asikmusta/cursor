@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    options {
+        gitBranch('main') // Replace 'main' with your actual branch name
+    }
     stages {
         // Stage 1: Build the Docker image using OpenShift
         stage('Build Docker Image') {
