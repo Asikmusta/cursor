@@ -8,7 +8,7 @@ RUN mkdir -p /tmp/nginx/cache && \
     ln -s /tmp/nginx/cache /var/cache/nginx
 
 # Custom nginx config to use writable paths
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf # Make sure nginx.conf listens on 8080
 
 # Copy app files
 COPY . /usr/share/nginx/html
@@ -26,4 +26,4 @@ RUN chown -R myuser:myusergroup /usr/share/nginx/html
 # Run as the new non-root user
 USER myuser
 
-EXPOSE 80
+EXPOSE 8080
