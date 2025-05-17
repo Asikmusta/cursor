@@ -13,9 +13,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy app files
 COPY . /usr/share/nginx/html
 
-# Add a non-root user with a standard UID/GID and no password
+# Add a non-root user with a standard UID/GID and no password (Alpine-compatible)
 RUN addgroup -g 1000 myusergroup && \
-    adduser --uid 1000 --gid 1000 --disabled-password --home /usr/share/nginx/html myuser
+    adduser -u 1000 -G myusergroup -D -h /usr/share/nginx/html myuser
 
 # Make /tmp/nginx writable by the non-root user
 RUN chown -R myuser:myusergroup /tmp/nginx
@@ -27,4 +27,3 @@ RUN chown -R myuser:myusergroup /usr/share/nginx/html
 USER myuser
 
 EXPOSE 80
-
