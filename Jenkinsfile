@@ -1,11 +1,21 @@
 pipeline {
     agent any
-    options {
-        gitBranch('main') // Replace 'main' with your actual branch name
-    }
+
     stages {
-        // Stage 1: Build the Docker image using OpenShift
-        stage('Build Docker Image') {
+        // Stage 1: Checkout code from the correct branch
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'main']], // Replace 'main' with your branch (e.g., 'master')
+                    extensions: [],
+                    userRemoteConfigs: [[url: 'https://github.com/Asikmusta/cursor.git']]
+                ])
+            }
+        }
+
+        // Stage 2: Build Docker image in OpenShift
+        stage('Build') {
             steps {
                 script {
                     openshift.withCluster() {
@@ -15,16 +25,14 @@ pipeline {
             }
         }
 
-        // Stage 2: Deploy to OpenShift
-        stage('Deploy to OpenShift') {
+        // Stage 3: Deploy to OpenShift
+        stage('Deploy') {
             steps {
                 script {
                     openshift.withCluster() {
-                        // Create DeploymentConfig if it doesn't exist
                         if (!openshift.selector("dc", "cursor-app").exists()) {
                             openshift.newApp("cursor-app", "--name=cursor-app")
                         }
-                        // Trigger a rollout
                         def dc = openshift.selector("dc", "cursor-app")
                         dc.rollout().latest()
                     }
@@ -32,7 +40,7 @@ pipeline {
             }
         }
 
-        // Stage 3: Expose the Route (if not already done)
+        // Stage 4: Expose Route (if not exists)
         stage('Expose Route') {
             steps {
                 script {
