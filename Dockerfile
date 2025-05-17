@@ -1,11 +1,19 @@
 # Use lightweight Nginx image
 FROM nginx:alpine
 
-# Delete default Nginx files
+# 1. Cleanup default files (your existing requirement)
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy all files from your repo to Nginx's serving directory
+# 2. Permission fixes (new additions)
+RUN mkdir -p /var/cache/nginx/client_temp && \
+    chmod -R 755 /var/cache/nginx && \
+    chown -R nginx:nginx /var/cache/nginx
+
+# 3. Copy application files
 COPY . /usr/share/nginx/html
 
-# Expose port 80 (HTTP)
+# 4. Run as nginx user (UID 101) for security
+USER nginx
+
+# 5. Expose port
 EXPOSE 80
