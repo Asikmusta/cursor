@@ -8,7 +8,7 @@ RUN mkdir -p /tmp/nginx/cache && \
     ln -s /tmp/nginx/cache /var/cache/nginx
 
 # Custom nginx config to use writable paths
-COPY nginx.conf /etc/nginx/nginx.conf # Make sure nginx.conf listens on 8080
+COPY /tmp/build/inputs/nginx.conf /etc/nginx/nginx.conf
 
 # Copy app files
 COPY . /usr/share/nginx/html
